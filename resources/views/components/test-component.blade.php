@@ -1,3 +1,3 @@
-<div>
-    <!-- Order your soul. Reduce your wants. - Augustine -->
+<div id="app">
+    <example-component></example-component>
 </div>

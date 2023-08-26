@@ -6,6 +6,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
 
   <header>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <img alt="Vue logo" class="logo" src="@/assets/sport.jpg" width="75" height="75" />
 
     <div class="headbar">
@@ -15,8 +16,10 @@ import HelloWorld from './components/HelloWorld.vue'
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/team">Team</RouterLink>
         <RouterLink to="/game">Game</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
         <RouterLink to="/register">Register</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
+        <button @click="logout">Logout</button>
+        <!-- <RouterLink to="/logout">logout</RouterLink> -->
       </nav>
     </div>
   </header>
@@ -33,7 +36,7 @@ header {
 }
 
 .headbar {
-  width: 60%;
+  width: 75%;
 }
 
 .logo {
@@ -97,3 +100,27 @@ nav a:first-of-type {
   }
 }
 </style>
+
+<script>
+import axios from 'axios';
+
+export default {
+  methods: {
+    logout() {
+       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+       axios.defaults.headers.common['Authorization'] = `Bearer ${csrfToken}` 
+        // axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+      axios.post('http://127.0.0.1:8000/api/logout') // Adjust the API endpoint as needed
+        .then(() => {
+          // Clear user data, token, or perform any other client-side cleanup if needed
+          // Redirect to the login page or perform any other post-logout actions
+          // For example, you can use Vue Router to redirect to the login page
+          this.$router.push('/login');
+        })
+        .catch(error => {
+          console.error('Logout error:', error);
+        });
+    },
+  },
+};
+</script>

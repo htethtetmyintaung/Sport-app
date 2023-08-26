@@ -4,7 +4,7 @@
 		<div class="container mx-auto">
 			<div class="flex justify-center items-center h-screen px-6">
 				<!-- Row -->
-				<div class="w-full xl:w-3/4 lg:w-11/12 flex">
+				<div class="w-full xl:w-3/4 lg:w-11/12 flex h-full">
 					<!-- Col -->
 					<div
 						class="w-full h-auto bg-gray-400 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
@@ -13,10 +13,11 @@
 					<!-- Col -->
 					<div class="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none">
 						<h3 class="pt-4 text-2xl text-center">Create an Account!</h3>
-						<form class="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+
+						<form class="px-8 pt-6 pb-8 mb-4 bg-white rounded" @submit.prevent="registerPlayer">
 							<div class="mb-4 md:flex md:justify-between">
 								<div class="mb-4 md:mr-2 md:mb-0">
-									<label class="block mb-2 text-sm font-bold text-gray-700" for="firstName">
+									<label class="block mb-2 text-sm font-bold text-gray-700" for="firstname">
 										First Name
 									</label>
 									<input
@@ -24,10 +25,11 @@
 										id="firstName"
 										type="text"
 										placeholder="First Name"
+										v-model="formData.firstname" required autofocus autocomplete="firstname"
 									/>
 								</div>
 								<div class="md:ml-2">
-									<label class="block mb-2 text-sm font-bold text-gray-700" for="lastName">
+									<label class="block mb-2 text-sm font-bold text-gray-700" for="lastname">
 										Last Name
 									</label>
 									<input
@@ -35,8 +37,33 @@
 										id="lastName"
 										type="text"
 										placeholder="Last Name"
+										v-model="formData.lastname" required autofocus autocomplete="lastname"
 									/>
 								</div>
+							</div>
+							<div class="mb-4">
+								<label class="block mb-2 text-sm font-bold text-gray-700" for="birthdate">
+									Date Of Birth
+								</label>
+								<input
+									class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+									id="birthdate"
+									type="date"
+									placeholder="Date of birth"
+									v-model="formData.birthdate" required autofocus autocomplete="birthdate"
+								/>
+							</div>
+							<div class="mb-4">
+								<label class="block mb-2 text-sm font-bold text-gray-700" for="phone">
+									Phone Number
+								</label>
+								<input
+									class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+									id="phone"
+									type="number"
+									placeholder="Phone Number"
+									v-model="formData.phone" required autofocus autocomplete="phone"
+								/>
 							</div>
 							<div class="mb-4">
 								<label class="block mb-2 text-sm font-bold text-gray-700" for="email">
@@ -47,6 +74,7 @@
 									id="email"
 									type="email"
 									placeholder="Email"
+									v-model="formData.email" required autofocus autocomplete="email"
 								/>
 							</div>
 							<div class="mb-4 md:flex md:justify-between">
@@ -59,31 +87,34 @@
 										id="password"
 										type="password"
 										placeholder="******************"
+										v-model="formData.password" required autofocus autocomplete="password"
 									/>
 									<p class="text-xs italic text-red-500">Please choose a password.</p>
 								</div>
 								<div class="md:ml-2">
-									<label class="block mb-2 text-sm font-bold text-gray-700" for="c_password">
+									<label class="block mb-2 text-sm font-bold text-gray-700" for="password_confirmation">
 										Confirm Password
 									</label>
 									<input
 										class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-										id="c_password"
+										id="password_confirmation"
 										type="password"
 										placeholder="******************"
+										v-model="formData.password_confirmation" required autofocus autocomplete="password_confirmation"
 									/>
 								</div>
 							</div>
 							<div class="mb-6 text-center">
 								<button
 									class="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-									type="button"
+									type="submit"
 								>
 									Register Account
 								</button>
 							</div>
 							
 						</form>
+
 					</div>
 				</div>
 			</div>
@@ -91,7 +122,7 @@
 
          <!-- Section 3 -->
       <section class="bg-white">
-          <div class="max-w-screen-xl px-4 py-12 mx-auto space-y-8 overflow-hidden sm:px-6 lg:px-8">
+          <div class="max-w-screen-xl px-4 mx-auto space-y-8 overflow-hidden sm:px-6 lg:px-8">
               <div class="flex justify-center mt-8 space-x-6">
                   <a href="#" class="text-gray-400 hover:text-gray-500">
                       <span class="sr-only">Facebook</span>
@@ -132,6 +163,41 @@
   </div>
 </template>
 
-<style>
+<script>
+import axios from 'axios';
 
-</style>
+export default {
+  data() {
+    return {
+      // Your data properties here
+	  formData: {
+        firstname: '',
+        lastname: '',
+		birthdate:'',
+		phone:'',
+		email:'',
+		password:'',
+        password_confirmation: '',
+      },
+    };
+  },
+  methods: {
+    async registerPlayer() {
+		const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        // axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+		axios.defaults.headers.common['Authorization'] = `Bearer ${csrfToken}` 
+		// Send registration data to the Laravel API using Axios
+		axios.post('http://127.0.0.1:8000/api/register', this.formData)
+		.then(response => {
+			// Handle a successful registration response
+			console.log('Registration successful:', response.data);
+		})
+		.catch(error => {
+			// Handle registration errors
+			console.log('Registration failed:', error.response.data);
+		});
+		this.$router.push('/login');
+    },
+  },
+};
+</script>

@@ -5,20 +5,25 @@
             <div class="md:w-1/2 px-5">
                 <h2 class="text-2xl font-bold text-[#002D74]">Login</h2>
                 <p class="text-sm mt-4 text-[#002D74]">If you have an account, please login</p>
-                <form class="mt-6" action="#" method="POST">
-                    <div>
+                <form class="mt-6" @submit.prevent="login">
+                   
+                <!-- <div>
                     <label class="block text-gray-700">ID Number</label>
-                    <input type="number" name="" id="" placeholder="Enter ID Number" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autofocus autocomplete required>
-                </div>
+                    <input type="number" name="" id="" placeholder="Enter ID Number" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autofocus autocomplete required
+                        v-model="formData.email" 
+                    >
+                </div> -->
                 <div>
-                    <label class="block text-gray-700">Email Address</label>
-                    <input type="email" name="" id="" placeholder="Enter Email Address" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autofocus autocomplete required>
+                    <label class="block text-gray-700" for="email">Email Address</label>
+                    <input type="email" name="" id="email" placeholder="Enter Email Address" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" autofocus autocomplete="email" required
+                        v-model="formData.email"
+                    >
                 </div>
         
                 <div class="mt-4">
-                    <label class="block text-gray-700">Password</label>
-                    <input type="password" name="" id="" placeholder="Enter Password" minlength="6" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500
-                        focus:bg-white focus:outline-none" required>
+                    <label class="block text-gray-700" for="password">Password</label>
+                    <input type="password" name="" id="password" placeholder="Enter Password" minlength="6" class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500
+                        focus:bg-white focus:outline-none" required v-model="formData.password">
                 </div>
         
                 <div class="text-right mt-2">
@@ -41,7 +46,7 @@
 
          <!-- Section 3 -->
       <section class="bg-white">
-          <div class="max-w-screen-xl px-4 py-12 mx-auto space-y-8 overflow-hidden sm:px-6 lg:px-8">
+          <div class="max-w-screen-xl px-4 mx-auto space-y-8 overflow-hidden sm:px-6 lg:px-8">
               <div class="flex justify-center mt-8 space-x-6">
                   <a href="#" class="text-gray-400 hover:text-gray-500">
                       <span class="sr-only">Facebook</span>
@@ -82,6 +87,36 @@
   </div>
 </template>
 
-<style>
-
-</style>
+<script>
+import axios from 'axios';
+export default {
+  data() {
+    return {
+      formData: {
+        email: '',
+        password: '',
+      },
+    };
+  },
+  methods: {
+   
+    async login() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        // axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+          axios.defaults.headers.common['Authorization'] = `Bearer ${csrfToken}` 
+      // Send login data to the server (Laravel API)
+      axios.post('http://127.0.0.1:8000/api/login', this.formData)
+        .then(response => {
+            // Handle a successful login response
+            console.log('Login successful:', response.data);
+            // You can save user data or authentication token if needed
+        })
+        .catch(error => {
+            // Handle login errors, e.g., show validation errors
+            console.error('Login failed:', error.response.data);
+        });
+        this.$router.push('/team' );
+    },
+  },
+};
+</script>
